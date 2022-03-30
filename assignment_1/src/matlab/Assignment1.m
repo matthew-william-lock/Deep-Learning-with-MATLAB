@@ -9,7 +9,7 @@
 n_batch = 100;
 n_epochs = 40;
 shuffle = 0;
-lambda=0.5;
+lambda=0;
 eta = 0.001;
 
 % Init seed
@@ -60,20 +60,11 @@ accuracy_test = 0;
 
 %% Learn
 
-% Mini batches
+% Epochs
 for i=1:GDparams.n_epochs
     
-    % Create minibatches and do learning
-    for j=1:size(X_train,2)/GDparams.n_batch
-        
-        j_start = (j-1)*n_batch + 1;
-        j_end = j*n_batch;
-        inds = j_start:j_end;
-        Xbatch = X_train(:, j_start:j_end);
-        Ybatch = Y_train(:, j_start:j_end);
-
-        [W,b] = MiniBatchGD(Xbatch, Ybatch, GDparams, W, b, lambda);
-    end
+    % Minibatch GD
+    [W,b] = MiniBatchGD(X_train, Y_train, GDparams, W, b, lambda);
 
     % Compute loss at the end of the epoch
     loss_train(i) = ComputeCost(X_train,Y_train, W,b,lambda);
@@ -88,7 +79,7 @@ accuracy_test = ComputeAccuracy(X_test, Y_test, W, b)*100;
 
 %% Show results
 
-fprintf("Accuracy on Test Batch %0.2f\n",accuracy_test);
+fprintf("Accuracy on Test Batch : %0.2f %\n",accuracy_test);
 
 % Loss graph
 figure;
@@ -107,15 +98,15 @@ plot(accuracy_train);
 hold on;
 plot(accuracy_validate);
 legend('Training set','Validation set');
-ylabel('Epoch');
-xlabel('Accuracy (%)');
+xlabel('Epoch');
+ylabel('Accuracy (%)');
 title(sprintf('Accuracy over time (lambda = %0.3f,eta=%0.3f)',lambda,GDparams.eta));
-grid;gt
+grid;
 
 %% Show templates
-for i=1:10
-    im = reshape(W(i, :), 32, 32, 3);
-    s_im{i} = (im - min(im(:))) / (max(im(:)) - min(im(:)));
-    s_im{i} = permute(s_im{i}, [2, 1, 3]);
-end
-montage(s_im, 'Size', [2,5]);
+% for i=1:10
+%     im = reshape(W(i, :), 32, 32, 3);
+%     s_im{i} = (im - min(im(:))) / (max(im(:)) - min(im(:)));
+%     s_im{i} = permute(s_im{i}, [2, 1, 3]);
+% end
+% montage(s_im, 'Size', [2,5]);
