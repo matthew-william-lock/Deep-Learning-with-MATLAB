@@ -7,6 +7,7 @@
 % shuffle       shuffle the minibatches after each epoch (not implemented)
 
 %% Load the data
+clear;
 [X_train, Y_train, y_train] = LoadBatch('data_batch_1.mat');
 [X_validate, Y_validate, y_tvalidate] = LoadBatch('data_batch_2.mat');
 [X_test, Y_test, y_test] = LoadBatch('test_batch.mat');
@@ -35,12 +36,17 @@ X_test = X_test ./ repmat(std_X_test, [1, size(X_test, 2)]);
 %% Generate results
 
 % Setup paramater list
-lambda_list = [0,0,0.1,1];
-n_epochs_list = [40,40,40,40];
-n_batch_list = [100,100,100,100];
-eta_list = [0.1,0.001,0.001,0.001];
+% lambda_list = [0,0,0.1,1];
+% n_epochs_list = [40,40,40,40];
+% n_batch_list = [100,100,100,100];
+% eta_list = [0.1,0.001,0.001,0.001];
+lambda_list = [0.5];
+n_epochs_list = [40];
+n_batch_list = [100];
+eta_list = [0.001];
 
 % Setup matrices for datastorage
+W = normrnd(0,0.01,[size(Y_train,1),size(X_test,1)]);
 loss_train = zeros(length(eta_list),1,40);
 loss_validate = zeros(length(eta_list),1,40);
 accuracy_train = zeros(length(eta_list),1,40);
@@ -75,15 +81,15 @@ for experiment_no=1:length(eta_list)
     for i=1:GDparams.n_epochs
         
         % Minibatch GD
-        [W,b] = MiniBatchGD(X_train, Y_train, GDparams, W, b, lambda);
+        [W,b] = MiniBatchGDMBCE(X_train, Y_train, GDparams, W, b, lambda);
     
         % Compute loss at the end of the epoch
-        loss_train(experiment_no,i) = ComputeCost(X_train,Y_train, W,b,lambda);
-        loss_validate(experiment_no,i) = ComputeCost(X_validate,Y_validate, W,b,lambda);
+        loss_train(experiment_no,i) = ComputeCostMBCE(X_train,Y_train, W,b,lambda);
+        loss_validate(experiment_no,i) = ComputeCostMBCE(X_validate,Y_validate, W,b,lambda);
         accuracy_train(experiment_no,i) = ComputeAccuracy(X_train, Y_train, W, b);
         accuracy_validate(experiment_no,i) = ComputeAccuracy(X_validate, Y_validate, W, b);
-        cost_train(experiment_no,i) = ComputeCost(X_train, Y_train, W, b,0);
-        cost_validate(experiment_no,i) = ComputeCost(X_validate, Y_validate, W, b,0);
+        cost_train(experiment_no,i) = ComputeCostMBCE(X_train, Y_train, W, b,0);
+        cost_validate(experiment_no,i) = ComputeCostMBCE(X_validate, Y_validate, W, b,0);
     
         fprintf("Experiment %d - Epoch %d completed\n",experiment_no,i);
     end
@@ -103,8 +109,10 @@ n = length(eta_list);
 figure;
 set(gcf, 'Position', get(0, 'Screensize'));
 for experiment_no=1:n
+    
+    a = ceil(n/2);
 
-    h = subplot(n/2,n/2,experiment_no);
+    h = subplot(a,a,experiment_no);
 
     % Set paramts
     n_batch = n_batch_list(experiment_no);
@@ -138,7 +146,7 @@ figure;
 set(gcf, 'Position', get(0, 'Screensize'));
 for experiment_no=1:n
 
-    h = subplot(n/2,n/2,experiment_no);
+    h = subplot(a,a,experiment_no);
 
     % Set paramts
     n_batch = n_batch_list(experiment_no);
@@ -172,7 +180,7 @@ figure;
 set(gcf, 'Position', get(0, 'Screensize'));
 for experiment_no=1:n
 
-    h = subplot(n/2,n/2,experiment_no);
+    h = subplot(a,a,experiment_no);
 
     % Set paramts
     n_batch = n_batch_list(experiment_no);
