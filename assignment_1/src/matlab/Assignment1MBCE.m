@@ -36,14 +36,14 @@ X_test = X_test ./ repmat(std_X_test, [1, size(X_test, 2)]);
 %% Generate results
 
 % Setup paramater list
-% lambda_list = [0,0,0.1,1];
-% n_epochs_list = [40,40,40,40];
-% n_batch_list = [100,100,100,100];
-% eta_list = [0.1,0.001,0.001,0.001];
-lambda_list = [0.5];
-n_epochs_list = [40];
-n_batch_list = [100];
-eta_list = [0.001];
+lambda_list = [0,0,0.1,1];
+n_epochs_list = [40,40,40,40];
+n_batch_list = [100,100,100,100];
+eta_list = [0.1,0.001,0.001,0.001];
+% lambda_list = [0.5];
+% n_epochs_list = [40];
+% n_batch_list = [100];
+% eta_list = [0.001];
 
 % Setup matrices for datastorage
 W = normrnd(0,0.01,[size(Y_train,1),size(X_test,1)]);
@@ -86,16 +86,17 @@ for experiment_no=1:length(eta_list)
         % Compute loss at the end of the epoch
         loss_train(experiment_no,i) = ComputeCostMBCE(X_train,Y_train, W,b,lambda);
         loss_validate(experiment_no,i) = ComputeCostMBCE(X_validate,Y_validate, W,b,lambda);
-        accuracy_train(experiment_no,i) = ComputeAccuracy(X_train, Y_train, W, b);
-        accuracy_validate(experiment_no,i) = ComputeAccuracy(X_validate, Y_validate, W, b);
+        accuracy_train(experiment_no,i) = ComputeAccuracyMBCE(X_train, Y_train, W, b);
+        accuracy_validate(experiment_no,i) = ComputeAccuracyMBCE(X_validate, Y_validate, W, b);
         cost_train(experiment_no,i) = ComputeCostMBCE(X_train, Y_train, W, b,0);
         cost_validate(experiment_no,i) = ComputeCostMBCE(X_validate, Y_validate, W, b,0);
     
         fprintf("Experiment %d - Epoch %d completed\n",experiment_no,i);
     end
 
-    accuracy_test(experiment_no) = ComputeAccuracy(X_test, Y_test, W, b)*100;
+    accuracy_test(experiment_no) = ComputeAccuracyMBCE(X_test, Y_test, W, b)*100;
     W_history(:,:,experiment_no) = W;
+    [correct, incorrect] = ComputeAccuracyHisogramMBCE(X_test,Y_test,W,b);
 
 end
 
@@ -208,6 +209,31 @@ for experiment_no=1:n
     exportgraphics(myAxes,sprintf('cost_standard_%d.pdf',experiment_no));
 
 end
+
+% Histograms
+figure;
+set(gcf, 'Position', get(0, 'Screensize'));
+
+h = subplot(2,2,1);
+bar(correct);
+title('Correctly identified images per class');
+xlabel('Class');
+ylabel('Probability (%)');
+grid;
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',18);
+myAxes=findobj(h,'Type','Axes');
+exportgraphics(myAxes,sprintf('hist_correct.pdf'));
+
+h = subplot(2,2,2);
+bar(incorrect);
+title('Incorrectly identified images per class');
+xlabel('Class');
+ylabel('Probability (%)');
+grid;
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',18);
+myAxes=findobj(h,'Type','Axes');
+exportgraphics(myAxes,sprintf('hist_incorrect.pdf'));
+
 
 
 % fprintf("Accuracy on Test Batch : %0.2f %\n",accuracy_test);

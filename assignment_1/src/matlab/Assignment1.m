@@ -90,6 +90,7 @@ for experiment_no=1:length(eta_list)
 
     accuracy_test(experiment_no) = ComputeAccuracy(X_test, Y_test, W, b)*100;
     W_history(:,:,experiment_no) = W;
+    [correct, incorrect] = ComputeAccuracyHisogram(X_test,Y_test,W,b);
 
 end
 
@@ -200,6 +201,31 @@ for experiment_no=1:n
     exportgraphics(myAxes,sprintf('cost_standard_%d.pdf',experiment_no));
 
 end
+
+% Histograms
+figure;
+set(gcf, 'Position', get(0, 'Screensize'));
+
+h = subplot(2,2,1);
+bar(correct);
+title('Correctly identified images per class');
+xlabel('Class');
+ylabel('Probability (%)');
+grid;
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',18);
+myAxes=findobj(h,'Type','Axes');
+exportgraphics(myAxes,sprintf('hist_correct.pdf'));
+
+h = subplot(2,2,2);
+bar(incorrect);
+title('Incorrectly identified images per class');
+xlabel('Class');
+ylabel('Probability (%)');
+grid;
+set(findobj(gcf,'type','axes'),'FontName','Arial','FontSize',18);
+myAxes=findobj(h,'Type','Axes');
+exportgraphics(myAxes,sprintf('hist_incorrect.pdf'));
+
 
 
 % fprintf("Accuracy on Test Batch : %0.2f %\n",accuracy_test);
