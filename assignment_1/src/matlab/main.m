@@ -46,6 +46,7 @@ acc = ComputeAccuracy(X_train(:, 1:100), Y_train(:, 1:100), W, b);
 % 
 % [~, ~] = ComputeGradients(X, Y, P, W, lambda);
 
+lambda = 1;
 X = X_train(:, 1);
 Y = Y_train(:, 1);
 P = EvaluateClassifier(X, W,b);
@@ -55,8 +56,8 @@ P = EvaluateClassifier(X, W,b);
 %% Calculate gradients accuracy
 
 % Data and parameter setup
-X = X_train(:, 1:20);
-Y = Y_train(:, 1:20);
+X = X_train(:, 1:101);
+Y = Y_train(:, 1:101);
 P = EvaluateClassifier(X, W,b);
 lambda = 1;
 
@@ -83,7 +84,7 @@ val= abs(grad_W-W_num)/max(10^-6,norm(grad_W)+norm(W_num));
 val_max = max(max(val));
 
 val_b= abs(grad_b-b_num)/max(10^-6,norm(grad_b)+norm(b_num));
-val_b_max = max(max(val));
+val_b_max = max(max(val_b));
 
 %% Calculate gradients with multiple cross ...
 
